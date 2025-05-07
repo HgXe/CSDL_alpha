@@ -381,6 +381,9 @@ class JaxSimulator(SimulatorBase):
         
     def save_external(self, filename:str, groupname:str):
         from csdl_alpha.src.data import save_h5py_variables
+        # update variable values
+        for output in self.saved_outputs:
+            output.value = self[output]
         save_h5py_variables(filename, groupname, self.saved_outputs)
 
     def add_callback(self, func:Callable):
