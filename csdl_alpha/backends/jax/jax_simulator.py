@@ -283,7 +283,7 @@ class JaxSimulator(SimulatorBase):
             print(f"compiling 'run_forward' function ... ({len(self.recorder.node_graph_map)} nodes)")
             self.run_forward_func = create_jax_interface(
                 list(self.recorder.design_variables.keys()),
-                list(self.recorder.objectives.keys())+list(self.recorder.constraints.keys()),
+                list(self.recorder.objectives.keys())+list(self.recorder.constraints.keys())+self.saved_outputs,
                 self.recorder.get_root_graph(),
                 device = self._gpu,
                 enable_f64=self.use_f64,
