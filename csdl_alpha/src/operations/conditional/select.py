@@ -91,13 +91,13 @@ class Select(Operation):
             # Gradient flows to on_true where pred is True
             # Create zeros with the same shape as cotangents[y]
             zeros_like_cotangent = csdl.Variable(shape=cotangents[y].shape, value=0.0)
-            cotangents.accumulate(on_true, csdl.select(pred, cotangents[y], zeros_like_cotangent, logic=self.logic))
+            cotangents.accumulate(on_true, csdl.experimental.select(pred, cotangents[y], zeros_like_cotangent, logic=self.logic))
             
         if cotangents.check(on_false):
             # Gradient flows to on_false where pred is False
             # Create zeros with the same shape as cotangents[y]
             zeros_like_cotangent = csdl.Variable(shape=cotangents[y].shape, value=0.0)
-            cotangents.accumulate(on_false, csdl.select(pred, zeros_like_cotangent, cotangents[y], logic=self.logic))
+            cotangents.accumulate(on_false, csdl.experimental.select(pred, zeros_like_cotangent, cotangents[y], logic=self.logic))
 
         # pred is boolean/discrete, so no gradient flows through it
 
@@ -130,7 +130,7 @@ def select(pred: VariableLike, on_true: VariableLike, on_false: VariableLike, lo
     >>> pred = csdl.Variable(value=np.array([True, False, True]))
     >>> on_true = csdl.Variable(value=np.array([1.0, 2.0, 3.0]))
     >>> on_false = csdl.Variable(value=np.array([4.0, 5.0, 6.0]))
-    >>> result = csdl.select(pred, on_true, on_false)
+    >>> result = csdl.experimental.select(pred, on_true, on_false)
     # result.value = [1.0, 5.0, 3.0]
     """
     pred = validate_and_variablize(pred)
@@ -204,7 +204,7 @@ class SelectN(Operation):
                 zeros_like_cotangent = csdl.Variable(shape=cotangents[y].shape, value=0.0)
                 # cot_args = [cotangents[y] if j == i else zeros_like_cotangent for j in range(len(args))]
                 logic = lambda x, i=i: x == i
-                cotangents.accumulate(arg, csdl.select(pred, cotangents[y], zeros_like_cotangent, logic=logic))
+                cotangents.accumulate(arg, csdl.experimental.select(pred, cotangents[y], zeros_like_cotangent, logic=logic))
 
         # pred is boolean/discrete, so no gradient flows through it - set to zero
         if cotangents.check(pred):
@@ -241,7 +241,7 @@ def select_n(pred: VariableLike, *args: VariableLike) -> Variable:
     >>> on_0 = csdl.Variable(value=np.array([1.0, 2.0, 3.0]))
     >>> on_1 = csdl.Variable(value=np.array([4.0, 5.0, 6.0]))
     >>> on_2 = csdl.Variable(value=np.array([7.0, 8.0, 9.0]))
-    >>> result = csdl.select(pred, on_0, on_1, on_2)
+    >>> result = csdl.experimental.select(pred, on_0, on_1, on_2)
     # result.value = [1.0, 5.0, 9.0]
     """
     pred = validate_and_variablize(pred)
