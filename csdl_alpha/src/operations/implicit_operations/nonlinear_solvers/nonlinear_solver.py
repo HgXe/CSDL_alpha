@@ -37,7 +37,10 @@ class NonlinearSolver(object):
         
         # state variable -> any other information about the state such as initial value, tolerance, etc.
         self.state_metadata:dict[Variable:Any] = {}
-        
+
+        # dummy states are non-differentiable output variables of the nonlinear solver
+        self.dummy_states:list[Variable] = []
+
         # CSDL variables that are "constants" from the perspective of the solver everytime it is ran
         # for example:
         # - initial conditions,
@@ -152,6 +155,11 @@ class NonlinearSolver(object):
         self.add_intersection_source(state)
         self.add_intersection_target(residual)
 
+    def add_dummy_state(self, var:Variable):
+        """Add a non-differentiable output variable to the nonlinear solver."""
+        self.dummy_states.append(var)
+        self.add_intersection_source(var)
+
     def add_intersection_source(self, source:Variable):
         self._intersection_sources.add(source)
 
@@ -247,7 +255,7 @@ class NonlinearSolver(object):
         recorder._exit_subgraph()
 
         # 1.d/e
-        state_variables = set(self.state_to_residual_map.keys())
+        state_variables = set(self.state_to_residual_map.keys()) | set(self.dummy_states)
         input_variables_set = self.meta_input_variables.union(S_inputs.symmetric_difference(state_variables))
         output_variables_set = state_variables.union(S_outputs)
         

@@ -57,10 +57,15 @@ class CSDLTest():
         if self.backend_type not in ['inline', 'jax']:
             raise ValueError(f"Backend type {self.backend_type} not supported for testing. Use 'inline', 'jax'")
         
+        # Capture any explicit override set by the test instance before reading CLI/defaults
+        explicit_batched = getattr(self, 'batched_deriv', None)
         try:
             self.batched_deriv = self._config.getoption("--batched_derivs")
         except:
             self.batched_deriv = False
+        # If the test set batched_deriv beforehand, honor it over CLI/default
+        if explicit_batched is not None:
+            self.batched_deriv = explicit_batched
 
         import csdl_alpha as csdl
         import numpy as np

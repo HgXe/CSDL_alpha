@@ -79,7 +79,7 @@ class ImplicitOperation(SubgraphOperation):
         # outputs have the states, residuals aren't an output
         # need to make states an input to the jax function, and residuals an output
 
-        state_vars = list(self.nonlinear_solver.state_to_residual_map.keys())
+        state_vars = list(self.nonlinear_solver.state_to_residual_map.keys()) + self.nonlinear_solver.dummy_states
         residuals = list(self.nonlinear_solver.state_to_residual_map.values())
         non_state_output_vars = [output for output in self.outputs if output not in state_vars]
         graph_inputs = [input for input in self.inputs if input in self._subgraph.node_table]
